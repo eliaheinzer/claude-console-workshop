@@ -711,3 +711,27 @@ a.flow-node:hover b {
     display: none;
   }
 }
+
+/* Launch screen fills the first view; the app opens from the button */
+.landing .launch {
+  min-height: calc(100svh - 4.5rem);
+  justify-content: center;
+  padding-bottom: 3rem;
+}
+
+/* Let the globe carry the screen: brighter video, a lighter overlay that only shades behind the text */
+.hero-video {
+  filter: brightness(1.35) saturate(1.25) contrast(1.05);
+}
+.hero-media::after {
+  background:
+    radial-gradient(ellipse 38% 34% at 50% 46%, rgb(10 11 34 / 0.62), rgb(10 11 34 / 0.25) 60%, transparent 100%),
+    linear-gradient(180deg, rgb(10 11 34 / 0.25) 0%, transparent 30%, transparent 75%, rgb(10 11 34 / 0.85) 96%, var(--ground) 100%);
+}
+.launch h1 {
+  font-size: clamp(2.8rem, 6.4vw, 6rem);
+  text-shadow: 0 4px 40px rgb(10 11 34 / 0.8);
+}
+.launch .hero-lead {
+  text-shadow: 0 2px 20px rgb(10 11 34 / 0.9);
+}
