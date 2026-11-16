@@ -640,3 +640,74 @@ a.flow-node:hover b {
     gap: 1.25rem;
   }
 }
+
+/* ---------- Hero background video (3D globe loop) ---------- */
+.hero-media {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: clamp(600px, 108vh, 1100px);
+  z-index: 0;
+  overflow: hidden;
+  pointer-events: none;
+  background: var(--ground) url("/assets/hero-poster.jpg") center / cover no-repeat;
+}
+.hero-video {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  pointer-events: none;
+}
+/* Darken behind the copy, and fade into the ground at the bottom */
+.hero-media::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background:
+    radial-gradient(ellipse 46% 44% at 50% 24%, rgb(10 11 34 / 0.82), rgb(10 11 34 / 0.45) 60%, transparent 100%),
+    linear-gradient(180deg, rgb(10 11 34 / 0.35) 0%, rgb(10 11 34 / 0.15) 45%, rgb(10 11 34 / 0.75) 80%, var(--ground) 100%);
+}
+.hero > .wrap,
+.hero > .flow {
+  position: relative;
+  z-index: 1;
+}
+.hero h1,
+.hero-lead {
+  text-shadow: 0 2px 24px rgb(10 11 34 / 0.9);
+}
+/* The screenshot floats over the video with a stronger glow */
+.hero-frame {
+  box-shadow:
+    0 0 0 1px rgb(140 200 255 / 0.22),
+    0 -1px 0 1px rgb(140 200 255 / 0.3),
+    0 0 90px -10px rgb(59 158 255 / 0.45),
+    0 0 180px -30px rgb(52 214 255 / 0.35),
+    0 50px 110px -30px rgb(0 0 0 / 0.95);
+  animation:
+    frame-in 0.8s var(--ease) 0.1s both,
+    frame-float 8s ease-in-out 1s infinite;
+}
+.hero-frame:hover {
+  box-shadow:
+    0 0 0 1px rgb(140 200 255 / 0.5),
+    0 0 110px -10px rgb(59 158 255 / 0.6),
+    0 0 200px -30px rgb(52 214 255 / 0.45),
+    0 50px 110px -30px rgb(0 0 0 / 0.95);
+}
+@keyframes frame-float {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-8px);
+  }
+}
+@media (max-width: 699px), (prefers-reduced-motion: reduce) {
+  .hero-video {
+    display: none;
+  }
+}
