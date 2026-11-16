@@ -368,6 +368,13 @@ html, body { max-width: 100%; overflow-x: hidden; }
   #lbody > table th:nth-child(2), #lbody > table td:nth-child(2) { display: none; }
   .tabs { overflow-x: auto; } .tabs button { white-space: nowrap; }
 }
+
+/* ---- One app: the Radar opens inside the Engine, in the same page ---- */
+#radarView { display: none; flex: 1; width: 100%; min-height: 0; border: 0; background: #0a0b22; }
+.view-radar #radarView { display: block; }
+.view-radar .guide, .view-radar #funnel, .view-radar main, .view-radar .title, .view-radar .actions { display: none !important; }
+.maplink { margin-left: auto; display: inline-flex; align-items: center; gap: 6px; min-height: 30px; padding: 0 12px; border: 1px solid rgb(59 158 255 / .5); border-radius: 999px; background: rgb(59 158 255 / .1); color: #8cc8ff; font: inherit; font-size: 12.5px; font-weight: 600; cursor: pointer; transition: background-color .15s, color .15s; }
+.maplink:hover { background: #3b9eff; color: #fff; }
 </style>
 </head>
 <body>
@@ -970,6 +977,71 @@ $("#skip").onclick = () => { if (!running) { logLines = []; finish(); } };
     setTimeout(() => { queued = false; render(); label(); }, 60);
   }).observe(document.body, { childList: true, subtree: true, characterData: true });
   render(); label();
+})();
+</script>
+
+<script>
+/* One app: Engine and Radar in one page. The Radar loads in an iframe (?embed=1) and the two talk by postMessage. */
+(() => {
+  const body = document.body;
+  const nav = document.querySelector(".appnav");
+  const [engineTab, radarTab] = nav.querySelectorAll("a");
+  const frame = document.createElement("iframe");
+  frame.id = "radarView";
+  frame.title = "Radar: every client on one map";
+  document.querySelector("header.top").after(frame);
+  let loaded = false, pendingTown = null;
+
+  function setTab(radar) {
+    body.classList.toggle("view-radar", radar);
+    engineTab.toggleAttribute("aria-current", !radar); if (!radar) engineTab.setAttribute("aria-current", "page");
+    radarTab.toggleAttribute("aria-current", radar); if (radar) radarTab.setAttribute("aria-current", "page");
+  }
+  function showRadar(town) {
+    setTab(true);
+    if (!frame.src) {
+      frame.src = "/radar?embed=1" + (town ? "&town=" + encodeURIComponent(town) : "");
+      frame.addEventListener("load", () => { loaded = true; if (pendingTown) { frame.contentWindow.postMessage({ type: "frank:showTown", town: pendingTown }, "*"); pendingTown = null; } }, { once: true });
+    } else if (town) {
+      if (loaded) frame.contentWindow.postMessage({ type: "frank:showTown", town }, "*"); else pendingTown = town;
+    }
+    history.replaceState(null, "", "#radar");
+  }
+  function showEngine() { setTab(false); history.replaceState(null, "", location.pathname + location.search); }
+
+  // Open an account from a town: run the engine if needed, then select the best account there
+  function openTown(town) {
+    showEngine();
+    const go = () => {
+      const c = (D.clients || []).filter(c => c.town === town).sort((a, b) => (b.opps?.[0]?.value || 0) - (a.opps?.[0]?.value || 0))[0];
+      if (c) { select(c.id); document.querySelector("#lbody tr.row.sel")?.scrollIntoView({ block: "center" }); }
+    };
+    if (!document.querySelector("#lbody tr.row")) { document.getElementById("skip")?.click(); setTimeout(go, 400); } else go();
+  }
+
+  engineTab.addEventListener("click", e => { e.preventDefault(); showEngine(); });
+  radarTab.addEventListener("click", e => { e.preventDefault(); showRadar(); });
+  window.addEventListener("message", e => { if (e.data?.type === "frank:openTown") openTown(e.data.town); });
+
+  // "Show on map" on every account
+  const addMapLink = () => {
+    const meta = document.querySelector(".dhead .meta");
+    if (!meta || meta.querySelector(".maplink")) return;
+    const c = D?.clients?.find(x => x.id === sel);
+    if (!c) return;
+    const b = document.createElement("button");
+    b.type = "button"; b.className = "maplink"; b.textContent = "Show " + c.town + " on the map";
+    b.addEventListener("click", () => showRadar(c.town));
+    meta.appendChild(b);
+  };
+  let q = false;
+  new MutationObserver(() => { if (q) return; q = true; setTimeout(() => { q = false; addMapLink(); }, 60); })
+    .observe(document.getElementById("dbody")?.parentElement || body, { childList: true, subtree: true });
+
+  // Deep links: /demo?town=Lisboa opens that town's account, /demo#radar opens the map
+  const town = new URLSearchParams(location.search).get("town");
+  if (town) setTimeout(() => openTown(town), 300);
+  else if (location.hash === "#radar") showRadar();
 })();
 </script>
 </body>
