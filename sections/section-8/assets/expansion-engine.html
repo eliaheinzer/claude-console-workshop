@@ -335,6 +335,39 @@ html { background: #0a0b22; } body { min-height: 100vh; background-attachment: f
 .guide-hidden .guide-open { display: inline-flex; }
 .stage { cursor: help; }
 @media (max-width: 1100px) { .guide { flex-wrap: wrap; } .guide-steps { flex-wrap: wrap; } }
+
+/* ---- Empty states, tab hints, tighter table rows, small screens ---- */
+.empty { display: grid; place-items: center; min-height: 100%; padding: 32px 24px; }
+.right > .empty { flex: 1; }
+.es { max-width: 340px; text-align: center; }
+.es-ic { display: grid; place-items: center; width: 40px; height: 40px; margin: 0 auto 14px; border-radius: 50%; border: 1px solid rgb(52 214 255 / .45); background: rgb(52 214 255 / .08); color: #34d6ff; font-weight: 700; font-size: 16px; }
+.es h3 { margin: 0 0 6px; color: #fff; font-size: 18px; letter-spacing: -.01em; }
+.es p { margin: 0 0 18px; color: var(--muted); font-size: 14.5px; line-height: 1.5; }
+.es-btn { min-height: 44px; padding: 0 22px; font-size: 15px; }
+.tabhint { flex: none; margin: 0; padding: 9px 18px; color: var(--muted); font-size: 13px; line-height: 1.4; border-bottom: 1px solid rgb(255 255 255 / .05); }
+.clamp2 { display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: 2; overflow: hidden; line-height: 1.35; }
+.divider { color: #4ade80; cursor: help; }
+#lbody > table th:nth-child(3) { width: 30%; }
+#lbody > table .clamp2 { font-size: 13.5px; }
+#lbody > table td, #lbody > table th { padding-left: 8px; padding-right: 8px; }
+#lbody > table td:first-child, #lbody > table th:first-child { padding-left: 14px; }
+@media (min-width: 1101px) { main { grid-template-columns: minmax(380px, 46%) 1fr; } }
+#lbody > table td:nth-child(2) .sub { white-space: nowrap; }
+html, body { max-width: 100%; overflow-x: hidden; }
+@media (max-width: 720px) {
+  .top { flex-wrap: wrap; gap: 10px; padding: 10px 14px; }
+  .top .title { display: none; }
+  .actions { flex-wrap: wrap; margin-left: auto; }
+  .guide { margin: 10px 14px 0; gap: 10px; }
+  .guide-hint { flex: 1 1 100%; order: -1; padding-right: 28px; }
+  .guide { position: relative; } .guide-close { position: absolute; top: 4px; right: 4px; }
+  .funnel { padding: 10px 14px; gap: 6px; } .stage { flex: 1 1 44%; }
+  main { padding: 0 14px 14px; grid-template-columns: minmax(0, 1fr); }
+  .panel { min-width: 0; }
+  .panel .body { overflow-x: auto; }
+  #lbody > table th:nth-child(2), #lbody > table td:nth-child(2) { display: none; }
+  .tabs { overflow-x: auto; } .tabs button { white-space: nowrap; }
+}
 </style>
 </head>
 <body>
@@ -356,14 +389,14 @@ html { background: #0a0b22; } body { min-height: 100vh; background-attachment: f
 <main>
   <section class="panel left">
     <nav class="tabs" id="ltabs">
-      <button data-t="clients" class="on">Usage Radar</button>
-      <button data-t="log">Agent log</button>
-      <button data-t="insights">Insights</button>
+      <button data-t="clients" class="on" title="Every client, scored on how they use FRANK">Usage Radar</button>
+      <button data-t="log" title="What each agent did during the run, step by step">Agent log</button>
+      <button data-t="insights" title="Totals across the client base and the pricing calculator">Insights</button>
     </nav>
     <div class="body" id="lbody"></div>
   </section>
   <section class="panel right">
-    <div id="detail" class="empty">Press <b>Run the engine</b> to score the client base.</div>
+    <div id="detail" class="empty"><div class="es"><div class="es-ic" aria-hidden="true">2</div><h3>Then open one account</h3><p>You will see its usage signals, its value report and the nudge that turns it into a signed upgrade.</p><button type="button" class="ghost es-btn" onclick="document.getElementById('skip').click()">Skip to the results</button></div></div>
   </section>
 </main>
 <script>
@@ -560,7 +593,7 @@ function live() {
 function renderFunnel(active) {
   $("#funnel").innerHTML = STAGES.map((s, i) => {
     const done = s.sim ? ran : shown[s.k] != null;
-    return (i === 5 ? `<div class="divider">simulated live</div>` : "") +
+    return (i === 5 ? `<div class="divider" title="Stages 1 to 5 are computed by the engine. Stages 6 to 8 fill in as you play the client in tab 3.">you play the client</div>` : "") +
       `<div class="stage ${s.sim ? "sim" : ""} ${done ? "done" : ""} ${active === s.k ? "active" : ""}">
         <div class="who">${i + 1} · ${s.who}</div><div class="n">${done ? s.v() : "–"}</div>
         <div class="what">${done ? esc(s.what()) : "&nbsp;"}</div></div>`;
@@ -630,7 +663,7 @@ function renderLeft() {
     el.scrollTop = el.scrollHeight; return;
   }
   if (ltab === "insights") { el.innerHTML = insightsHTML(); bindCalc(); return; }
-  if (!ran) { el.innerHTML = `<div class="empty">No accounts scored yet.</div>`; return; }
+  if (!ran) { el.innerHTML = running ? `<div class="empty">Scoring the client base…</div>` : `<div class="empty"><div class="es"><div class="es-ic" aria-hidden="true">1</div><h3>No accounts scored yet</h3><p>Run the engine to score all 150 clients and find the ones ready to grow.</p><button type="button" class="primary es-btn" onclick="document.getElementById('run').click()">Run the engine</button></div></div>`; return; }
   const top = el.scrollTop;
   const rows = D.clients.filter(c => filter === "all" || (filter === "auto" && c.route === "auto" && c.opps.length && !c.at_risk) ||
     (filter === "human" && c.route === "human") || (filter === "risk" && c.at_risk));
@@ -642,7 +675,7 @@ function renderLeft() {
       return `<tr class="row ${c.id === sel ? "sel" : ""}" data-n="${c.id}">
         <td>${esc(c.name)}<div class="sub">${esc(c.town)} · ${c.plan}</div></td>
         <td><div class="bar"><i class="${pct > 1 ? "over" : ""}" style="width:${Math.min(100, pct * 100)}%"></i></div><div class="sub">${c.limit ? Math.round(pct * 100) + "% of plan" : `${c.offices_live} of ${c.offices} offices`}</div></td>
-        <td>${o ? esc(o.title) : `<span class="muted">Healthy, nothing to do</span>`}</td>
+        <td>${o ? `<div class="clamp2" title="${esc(o.title)}">${esc(o.title)}</div>` : `<span class="muted">Healthy, nothing to do</span>`}</td>
         <td class="num">${c.at_risk ? `<span style="color:var(--red)">${eur(c.at_risk)} at risk</span>` : c.potential ? "+" + eur(c.potential) : "–"}</td>
         <td>${statusPill(c)}</td></tr>`;
     }).join("") + `</tbody></table>`;
@@ -697,10 +730,11 @@ function renderDetail(keep) {
   const b0 = $(".right .body"), top = b0 ? b0.scrollTop : 0;
   el.className = ""; el.style.cssText = "display:flex;flex-direction:column;min-height:0;flex:1";
   const large = c.profile === "large";
-  const tab = (k, label) => `<button data-t="${k}" class="${dtab === k ? "on" : ""}">${label}</button>`;
+  const tabTip = { radar: "What the engine noticed in this account's usage, and what each signal is worth a year.", report: "The monthly report the client receives: hours saved, what that is worth, one next step.", play: large ? "The plan the engine prepares for a person at FRANK to take to this broker." : "FRANK's message to the client. You play the client: reply and accept the trial until the upgrade is signed." };
+  const tab = (k, label) => `<button data-t="${k}" title="${tabTip[k]}" class="${dtab === k ? "on" : ""}">${label}</button>`;
   el.innerHTML = `<div class="dhead"><h2>${esc(c.name)}</h2><div class="meta"><span>${esc(c.town)}</span>
       <span>${large ? `Large broker · ${c.offices} offices` : `Owner-led agency · ${c.plan} plan`}</span><span>Health ${c.health}</span>${statusPill(c)}</div></div>
-    <nav class="tabs" id="dtabs">${tab("radar", "1 · Radar signals")}${tab("report", "2 · Value report")}${tab("play", large ? "3 · Expansion plan" : "3 · Nudge and convert")}</nav>
+    <nav class="tabs" id="dtabs">${tab("radar", "1 · Radar signals")}${tab("report", "2 · Value report")}${tab("play", large ? "3 · Expansion plan" : "3 · Nudge and convert")}</nav><p class="tabhint">${tabTip[dtab]}</p>
     <div class="body"><div class="dbody">${dtab === "radar" ? radarHTML(c) : dtab === "report" ? reportHTML(c) : playHTML(c)}</div></div>`;
   const b = $(".right .body");
   if (keep) b.scrollTop = top; else if (dtab === "play" && play[c.id]?.answered) b.scrollTop = b.scrollHeight;
@@ -933,7 +967,7 @@ $("#skip").onclick = () => { if (!running) { logLines = []; finish(); } };
   new MutationObserver(() => {
     if (queued) return;
     queued = true;
-    requestAnimationFrame(() => { queued = false; render(); label(); });
+    setTimeout(() => { queued = false; render(); label(); }, 60);
   }).observe(document.body, { childList: true, subtree: true, characterData: true });
   render(); label();
 })();

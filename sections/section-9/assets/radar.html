@@ -158,16 +158,39 @@ h1 { color: #fff; }
 .appbar .brand { color: #fff; font-weight: 800; font-size: 21px; letter-spacing: .01em; text-decoration: none; padding-right: 18px; border-right: 1px solid #252957; }
 .appbar .brand span { color: #3b9eff; }
 html { background: #0a0b22; } body { min-height: 100vh; background-attachment: fixed !important; }
+/* ---- Guide bar: the three steps of the Radar, always one click away (same look as the Engine) ---- */
+.guide { display: flex; align-items: center; gap: 14px; margin: 0 0 14px; padding: 10px 12px 10px 16px; border: 1px solid #252957; border-radius: 12px; background: linear-gradient(90deg, rgb(59 158 255 / .12), rgb(52 214 255 / .04)); }
+.guide-hint { flex: 1; min-width: 0; margin: 0; color: #e9ecf7; font-size: 14px; }
+.guide-hint b { color: #fff; }
+.guide-steps { display: flex; gap: 6px; margin: 0; padding: 0; list-style: none; }
+.guide-steps button { display: flex; align-items: center; gap: 8px; min-height: 36px; padding: 0 12px 0 6px; border: 1px solid #252957; border-radius: 999px; background: rgb(255 255 255 / .03); color: #9ba4c0; font: inherit; font-weight: 600; font-size: 13px; white-space: nowrap; cursor: pointer; transition: background-color .15s, color .15s, border-color .15s, box-shadow .2s; }
+.guide-steps button:hover { color: #fff; border-color: #3a3f7a; }
+.guide-steps i { display: grid; place-items: center; width: 24px; height: 24px; border-radius: 50%; background: #252957; color: #fff; font-style: normal; font-size: 12px; }
+.guide-steps .done { color: #e9ecf7; }
+.guide-steps .done i { background: #4ade80; color: #0a0b22; }
+.guide-steps .now { color: #fff; border-color: #3b9eff; box-shadow: 0 0 0 3px rgb(59 158 255 / .2); }
+.guide-steps .now i { background: #3b9eff; }
+.guide-close { border: 0; background: none; color: #9ba4c0; font-size: 20px; line-height: 1; padding: 4px 6px; cursor: pointer; }
+.guide-close:hover { color: #fff; }
+.guide-open { display: none; margin-left: auto; align-items: center; min-height: 34px; padding: 0 12px; border: 1px solid #252957; border-radius: 999px; background: rgb(255 255 255 / .03); color: #9ba4c0; font: inherit; font-weight: 600; font-size: 13px; white-space: nowrap; cursor: pointer; }
+.guide-open:hover { color: #fff; border-color: #3a3f7a; }
+.guide-hidden .guide { display: none; }
+.guide-hidden .guide-open { display: inline-flex; }
+.guide-steps button:focus-visible, .guide-close:focus-visible, .guide-open:focus-visible { outline: 2px solid #3b9eff; outline-offset: 2px; }
+@media (max-width: 1100px) { .guide { flex-wrap: wrap; } .guide-steps { flex-wrap: wrap; } .guide-hint { flex-basis: 100%; } .guide { position: relative; padding-right: 44px; } .guide-close { position: absolute; top: 8px; right: 8px; } }
+@media (max-width: 560px) { .appbar { gap: 10px; padding: 10px 12px; } .appbar .brand { padding-right: 10px; font-size: 19px; } .appnav a { padding: 6px 9px; font-size: 13px; } .guide-open { width: 34px; padding: 0; justify-content: center; font-size: 0; flex: none; } .guide-open::before { content: "?"; font-size: 14px; } }
+@media (prefers-reduced-motion: reduce) { .guide-steps button { transition: none; } }
 </style>
 </head>
 <body>
 <header class="appbar">
   <a class="brand" href="/" title="Back to the product page">FRANK<span>.</span></a>
   <nav class="appnav" aria-label="App"><a href="/demo">Expansion Engine</a><a href="/radar" aria-current="page">Radar</a></nav>
+  <button class="guide-open" id="guideOpen" type="button">How it works</button>
 </header>
 <div class="wrap">
   <div class="head">
-    <div><h1>Radar</h1><div class="sub">Where FRANK's clients are today and where it goes next · synthetic client base, real UK register counts</div></div>
+    <div><h1>Radar</h1><div class="sub">A map of where FRANK's clients are today and where it could grow next. Client numbers are demo data; UK counts are real.</div></div>
     <div class="controls">
       <div class="seg" id="views"><span>View</span><button data-v="world" class="on">World</button><button data-v="europe">Europe</button><button data-v="pt">Portugal</button><button data-v="uk">UK</button></div>
       <button class="ai" id="aitop">✦ AI account manager</button>
@@ -180,12 +203,12 @@ html { background: #0a0b22; } body { min-height: 100vh; background-attachment: f
       <svg id="svg" preserveAspectRatio="xMidYMid meet"><g id="gc"></g><g id="gm"></g><g id="gd"></g><g id="gp"></g></svg>
       <div class="callout" id="callout"><b>Lisbon</b>FRANK is based here. Team of 20, serving agencies from the north to the islands.</div>
       <div class="zoom"><button id="zin" aria-label="Zoom in">+</button><button id="zout" aria-label="Zoom out">−</button></div>
-      <div class="legend"><b>Markets</b>
-        <div><span class="sw" style="background:var(--live)"></span>Live today: Portugal</div>
-        <div><span class="sw" style="background:var(--named)"></span>Named on FRANK's website</div>
-        <div><span class="sw" style="background:var(--region)"></span>Target region from 2027 (brief)</div>
-        <div><span class="sw round" style="background:var(--dot)"></span>Clients by town (synthetic)</div>
-        <div><span class="sw round" style="background:var(--uk)"></span>UK prospects by postcode area</div></div>
+      <div class="legend"><b>What the map shows</b>
+        <div><span class="sw" style="background:var(--live)"></span>Portugal: where FRANK sells today</div>
+        <div><span class="sw" style="background:var(--named)"></span>Countries FRANK names on its website</div>
+        <div><span class="sw" style="background:var(--region)"></span>Regions FRANK plans to enter from 2027</div>
+        <div><span class="sw round" style="background:var(--dot)"></span>FRANK clients in a town (demo data)</div>
+        <div><span class="sw round" style="background:var(--uk)"></span>UK brokers FRANK could win, by area</div></div>
       <div class="chat" id="chat"><header><div><b id="ctitle"></b><span id="csub"></span></div><button id="cclose" aria-label="Close">×</button></header>
         <div class="msgs" id="msgs"></div>
         <footer><span>Scripted example built from this client's data. Live, a model such as Claude Opus would write each reply.</span><button id="creplay">Replay</button></footer></div>
@@ -331,6 +354,74 @@ const S = D.stats;
 $("#kpis").innerHTML = [[fmt(S.clients), "paying clients, all in Portugal"], [S.towns, "towns, mainland and islands"], [keur(S.billed), "billed a year"], ["+" + keur(S.potential), "expansion potential found"], [D.markets.length, "more markets named on FRANK's website"]]
   .map(([b, s]) => `<div class="kpi"><b>${b}</b><span>${s}</span></div>`).join("");
 rank(); apply(); new ResizeObserver(apply).observe(map);
+/* Guide bar: shows the next step and does it on click. Reads the app's own DOM, changes no map or AI logic. */
+(() => {
+  const steps = [
+    { label: "Zoom to Portugal", hint: "<b>Step 1.</b> Press <b>Zoom to Portugal</b>. Every dot is a town with FRANK clients; a bigger dot means more clients." },
+    { label: "Pick a town", hint: "<b>Step 2.</b> Click a town in the list on the right to see its clients and what they are worth." },
+    { label: "Ask the AI", hint: "<b>Step 3.</b> Press <b>Ask the AI</b> to watch how FRANK's AI talks to a client in this town." },
+  ];
+  const bar = document.createElement("div");
+  bar.className = "guide";
+  bar.setAttribute("role", "region");
+  bar.setAttribute("aria-label", "How to use the Radar");
+  bar.innerHTML = `<p class="guide-hint" aria-live="polite"></p>
+    <ol class="guide-steps">${steps.map((s, i) => `<li><button type="button" data-step="${i}"><i>${i + 1}</i>${s.label}</button></li>`).join("")}</ol>
+    <button class="guide-close" type="button" aria-label="Hide the guide">×</button>`;
+  document.querySelector(".wrap").prepend(bar);
+
+  const q = s => document.querySelector(s);
+  // Progress only moves forward: a step stays ticked once it has been seen in the app
+  let zoomed = false, picked = false, asked = false, raf = 0;
+  function read() {
+    if (q('#views button[data-v="pt"]')?.classList.contains("on")) zoomed = true;
+    if (q("#town") && !q("#town").hidden) picked = zoomed = true;
+    if (q("#chat")?.classList.contains("open")) asked = picked = zoomed = true;
+  }
+  function render() {
+    raf = 0; read();
+    const done = [zoomed, picked, asked], now = done.findIndex(d => !d);
+    // Write only what changed, so the observers below never loop
+    const key = done.join() + now;
+    if (bar.dataset.key === key) return;
+    bar.dataset.key = key;
+    bar.querySelector(".guide-hint").innerHTML = now === -1
+      ? "<b>Done.</b> That is the AI account manager at work. Try another town, or open the <b>Expansion Engine</b>."
+      : steps[now].hint;
+    bar.querySelectorAll(".guide-steps button").forEach((b, i) => {
+      b.classList.toggle("done", done[i]);
+      b.classList.toggle("now", i === now);
+      b.querySelector("i").textContent = done[i] ? "✓" : i + 1;
+    });
+  }
+  const queue = () => { if (!raf) raf = setTimeout(render, 60); };
+
+  const topTown = () => q("#rank div[data-name]");
+  const openTop = () => { if (q("#ranking").hidden) q("#back")?.click(); topTown()?.click(); };
+  bar.addEventListener("click", e => {
+    if (e.target.closest(".guide-close")) { document.body.classList.add("guide-hidden"); return; }
+    const b = e.target.closest("[data-step]");
+    if (!b) return;
+    const n = +b.dataset.step;
+    if (n === 0) q('#views button[data-v="pt"]')?.click();
+    if (n === 1) openTop();
+    if (n === 2) {
+      if (q("#town").hidden) openTop();
+      // The town's own AI button; if this town has no open case, fall back to the app's best example
+      const ai = q("#town [data-town]");
+      if (ai) ai.click(); else q("#aitop")?.click();
+    }
+    queue();
+  });
+  q("#guideOpen")?.addEventListener("click", () => document.body.classList.remove("guide-hidden"));
+
+  // Watch only the three places that carry the state; none of them is written by render()
+  const mo = new MutationObserver(queue);
+  mo.observe(q("#views"), { attributes: true, attributeFilter: ["class"], subtree: true });
+  mo.observe(q("#town"), { attributes: true, attributeFilter: ["hidden"] });
+  mo.observe(q("#chat"), { attributes: true, attributeFilter: ["class"] });
+  render();
+})();
 </script>
 </body>
 </html>
