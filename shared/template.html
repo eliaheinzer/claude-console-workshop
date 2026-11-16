@@ -60,6 +60,65 @@
           <span class="shot-cta">Launch the app</span>
         </a>
       </div>
+
+  <!-- Data flow: one source in, two dashboards out -->
+        <section class="block flow" id="flow">
+          <div class="wrap">
+            <div class="flow-head">
+              <h2>One data source in, two dashboards out.</h2>
+              <p>
+                FRANK's database feeds our AI tool. The tool scores every account and hands the result
+                to two views of the same data.
+              </p>
+            </div>
+            <div class="flow-canvas" role="img" aria-label="Workflow: FRANK's database connects to the AI tool, which feeds two dashboards, the Expansion Engine and the Radar.">
+              <div class="flow-node is-trigger">
+                <span class="flow-icon" aria-hidden="true">
+                  <svg viewBox="0 0 24 24"><ellipse cx="12" cy="5.5" rx="7.5" ry="3" /><path d="M4.5 5.5v6.5c0 1.66 3.36 3 7.5 3s7.5-1.34 7.5-3V5.5M4.5 12v6.5c0 1.66 3.36 3 7.5 3s7.5-1.34 7.5-3V12" /></svg>
+                </span>
+                <b>FRANK database</b>
+                <small>Usage export: steps, users, flows, offices</small>
+              </div>
+
+              <svg class="flow-wire" viewBox="0 0 100 100" preserveAspectRatio="none" aria-hidden="true">
+                <path d="M0 50 H100" />
+                <path class="flow-pulse" d="M0 50 H100" />
+              </svg>
+
+              <div class="flow-node is-ai">
+                <span class="flow-icon" aria-hidden="true">
+                  <svg viewBox="0 0 24 24"><path d="M12 3l1.9 5.1L19 10l-5.1 1.9L12 17l-1.9-5.1L5 10l5.1-1.9L12 3z" /><path d="M18.5 15.5l.8 2.2 2.2.8-2.2.8-.8 2.2-.8-2.2-2.2-.8 2.2-.8.8-2.2z" /></svg>
+                </span>
+                <b>AI tool</b>
+                <small>Scores each account, sizes the upside, drafts the message</small>
+              </div>
+
+              <svg class="flow-wire is-split" viewBox="0 0 100 100" preserveAspectRatio="none" aria-hidden="true">
+                <path d="M0 39.36 C55 39.36 45 11.7 100 11.7" />
+                <path d="M0 39.36 C55 39.36 45 67.02 100 67.02" />
+                <path class="flow-pulse" d="M0 39.36 C55 39.36 45 11.7 100 11.7" />
+                <path class="flow-pulse" d="M0 39.36 C55 39.36 45 67.02 100 67.02" />
+              </svg>
+
+              <div class="flow-outputs">
+                <a class="flow-node is-out" href="/demo">
+                  <span class="flow-icon" aria-hidden="true">
+                    <svg viewBox="0 0 24 24"><path d="M4 20V10M10 20V4M16 20v-7M22 20H2" /></svg>
+                  </span>
+                  <b>Expansion Engine</b>
+                  <small>Dashboard 1: which account to grow, and how</small>
+                </a>
+                <a class="flow-node is-out" href="/radar">
+                  <span class="flow-icon" aria-hidden="true">
+                    <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9" /><path d="M3 12h18M12 3c2.8 3 2.8 15 0 18M12 3c-2.8 3-2.8 15 0 18" /></svg>
+                  </span>
+                  <b>Radar</b>
+                  <small>Dashboard 2: every client on one map</small>
+                </a>
+              </div>
+            </div>
+          </div>
+        </section>
     </main>
 
     <footer class="site-footer">

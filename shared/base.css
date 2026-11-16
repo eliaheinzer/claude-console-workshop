@@ -435,3 +435,208 @@ a {
     transform: none;
   }
 }
+
+/* ---------- Data flow (from PR #4): one source in, two dashboards out ---------- */
+.flow {
+  padding: clamp(4rem, 8vw, 6.5rem) 0;
+  border-top: 1px solid var(--line);
+}
+
+
+/* ---------- Data flow (workflow-style overview) ---------- */
+.flow-head {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  gap: 1.5rem 3rem;
+  align-items: end;
+  margin-bottom: 2rem;
+}
+.flow-head h2 {
+  margin: 0;
+}
+.flow-head p {
+  max-width: 48ch;
+  margin: 0;
+  color: var(--muted);
+}
+.flow-canvas {
+  display: grid;
+  --flow-h: 10.5rem; /* height of one output node */
+  --flow-gap: 2.5rem; /* gap between the two outputs */
+  grid-template-columns: auto minmax(2.5rem, 1fr) auto minmax(2.5rem, 1fr) auto;
+  align-items: start;
+  padding: clamp(2rem, 5vw, 4rem) clamp(1.25rem, 4vw, 3.5rem);
+  border: 1px solid var(--line);
+  border-radius: 1.25rem;
+  background:
+    radial-gradient(circle, rgb(255 255 255 / 0.09) 1px, transparent 1.5px) 0 0 / 22px 22px,
+    var(--card);
+}
+.flow-node {
+  position: relative;
+  display: grid;
+  justify-items: center;
+  gap: 0.35rem;
+  width: 12.5rem;
+  color: var(--ink);
+  text-align: center;
+  text-decoration: none;
+}
+.flow-node b {
+  margin-top: 0.5rem;
+  font-size: 1.05rem;
+  line-height: 1.2;
+}
+.flow-node small {
+  color: var(--muted);
+  font-size: 0.85rem;
+  line-height: 1.35;
+}
+.flow-icon {
+  position: relative;
+  display: grid;
+  place-items: center;
+  width: 5.5rem;
+  height: 5.5rem;
+  border: 1.5px solid #3a3f7a;
+  border-radius: 1.1rem;
+  background: #171a47;
+  transition: border-color 0.2s, transform 0.2s;
+}
+.flow-icon svg {
+  width: 2.4rem;
+  height: 2.4rem;
+  fill: none;
+  stroke: var(--cyan);
+  stroke-width: 1.6;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+/* ports where the wires attach */
+.flow-icon::before,
+.flow-icon::after {
+  content: "";
+  position: absolute;
+  top: 50%;
+  width: 0.6rem;
+  height: 0.6rem;
+  border-radius: 50%;
+  background: #8a93c4;
+  transform: translateY(-50%);
+}
+.flow-icon::before {
+  left: -0.36rem;
+}
+.flow-icon::after {
+  right: -0.36rem;
+}
+.flow-node.is-trigger .flow-icon {
+  border-radius: 2.75rem 1.1rem 1.1rem 2.75rem;
+}
+.flow-node.is-trigger .flow-icon::before,
+.flow-node.is-out .flow-icon::after {
+  display: none;
+}
+.flow-node.is-ai .flow-icon {
+  border-color: var(--blue);
+  background: linear-gradient(135deg, #1b2a6b, #171a47);
+  box-shadow: 0 0 0 4px rgb(59 158 255 / 0.12), 0 12px 40px -10px rgb(59 158 255 / 0.7);
+}
+.flow-node.is-ai .flow-icon svg {
+  stroke: #fff;
+}
+a.flow-node:hover .flow-icon,
+a.flow-node:focus-visible .flow-icon {
+  border-color: var(--cyan);
+  transform: translateY(-2px);
+}
+a.flow-node:hover b {
+  color: #fff;
+}
+.flow-outputs {
+  display: grid;
+  gap: var(--flow-gap);
+}
+.flow-outputs .flow-node {
+  height: var(--flow-h);
+  align-content: start;
+}
+/* Source and AI nodes sit level with the midpoint between the two output icons */
+.flow-canvas > .flow-node,
+.flow-canvas > .flow-wire:not(.is-split) {
+  margin-top: calc((var(--flow-h) + var(--flow-gap)) / 2);
+}
+/* Nodes are wider than their icons, so the wires reach in under the labels to touch the ports */
+.flow-wire {
+  width: calc(100% + 7rem);
+  height: 5.5rem;
+  margin-left: -3.5rem;
+  overflow: visible;
+}
+/* The split wire spans both outputs; its path ends at each output icon's centre */
+.flow-wire.is-split {
+  align-self: stretch;
+  height: auto;
+}
+.flow-wire path {
+  fill: none;
+  stroke: #5a629c;
+  stroke-width: 2;
+  vector-effect: non-scaling-stroke;
+}
+.flow-wire .flow-pulse {
+  stroke: var(--cyan);
+  stroke-dasharray: 6 18;
+  stroke-linecap: round;
+  animation: flow-run 1.2s linear infinite;
+}
+@keyframes flow-run {
+  to {
+    stroke-dashoffset: -24;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .flow-wire .flow-pulse {
+    animation: none;
+  }
+}
+@media (max-width: 900px) {
+  .flow-head {
+    grid-template-columns: 1fr;
+  }
+  .flow-canvas {
+    grid-template-columns: 1fr;
+    justify-items: center;
+    gap: 0;
+  }
+  .flow-node {
+    width: min(100%, 16rem);
+  }
+  .flow-canvas > .flow-node,
+  .flow-canvas > .flow-wire:not(.is-split) {
+    margin-top: 0;
+  }
+  .flow-outputs .flow-node {
+    height: auto;
+  }
+  .flow-icon::before,
+  .flow-icon::after {
+    display: none;
+  }
+  .flow-wire,
+  .flow-wire.is-split,
+  .flow-canvas > .flow-wire:not(.is-split) {
+    align-self: auto;
+    width: 2px;
+    height: 2.5rem;
+    margin: 0.75rem 0;
+    background: #5a629c;
+  }
+  .flow-wire path {
+    display: none;
+  }
+  .flow-outputs {
+    grid-template-columns: 1fr 1fr;
+    gap: 1.25rem;
+  }
+}
